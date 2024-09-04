@@ -23,11 +23,12 @@ function show_sfp($olt_id){
     global $sitename;
     global $labels;
     $table = $tbl_pref.'olt_sfp';
-    $query = "SELECT * FROM $table WHERE olt = $olt_id ORDER BY SUBSTRING(sfp,7)+0";
-    $resp = '';
+    $query = "SELECT * FROM $table WHERE olt = $olt_id";
+    $resp = 'SFP: ';
+    $search = array('EPON0/', 'GPON0/');
     if($result = $mysqli_wb->query($query)){
         while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
-            $sfp = str_replace('EPON0/', '', $row['sfp']);
+            $sfp = str_replace($search, '', $row['sfp']);
             if ($row['count_onu'] == 0){
                 continue;
             }

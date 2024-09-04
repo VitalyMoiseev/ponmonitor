@@ -17,6 +17,13 @@ $result->close();
 $olt_name = $row['name'];
 $olt_host = $row['host'];
 $olt_place = $row['place'];
+if ($row['type'] == 1){
+    $olt_gpon = true;
+    $tms1 = "SN";
+}else{
+    $olt_gpon = false;
+    $tms1 = "mac";
+}
     
 echo '<table class="features-table" width="100%"><thead><tr><td class="grey"><div align="left">';
 echo "<strong>";
@@ -42,7 +49,7 @@ if ($OrderOnu == 'order_id ASC'){
     echo "&nbsp;&uArr;";
 }
 echo "</span></a></strong></td>\n";
-echo "<td class=\"grey\"><strong><a href=\"\" onclick=\"sortby('mac'); return false;\">mac<span id=\"sort_mac\">";
+echo "<td class=\"grey\"><strong><a href=\"\" onclick=\"sortby('mac'); return false;\">$tms1<span id=\"sort_mac\">";
 if ($OrderOnu == 'mac ASC'){
     echo "&nbsp;&dArr;";
 }elseif ($OrderOnu == 'mac DESC'){
@@ -78,9 +85,10 @@ if ($OrderOnu == 'last_act ASC'){
 }
 echo "</span></a></strong></td>\n";
 echo "</tr></thead><tbody>";
-while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
-    $onu_t = $row;
-    $sfp_n = ltrim($onu_t['onu_name'], 'EPON0/');
+$cc1 = false;
+while( $onu_t = $result->fetch_array(MYSQLI_ASSOC) ){
+    $sfp_n = explode('/',$onu_t['onu_name']);
+    $sfp_n = $sfp_n[1];
     $sfp_n = explode(':',$sfp_n);
     $sfp_n = $sfp_n[0];
     #$sfp_n = substr($onu_t['onu_name'],6,1);

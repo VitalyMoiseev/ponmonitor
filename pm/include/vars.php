@@ -1,8 +1,9 @@
 <?php
+
 # Параметри доступа БД
 $dbhost_wb = 'localhost';
 $dbuser_wb = 'ponmon';
-$dbpassword_wb = 'ponmon';
+$dbpassword_wb = '**********';
 $database_wb = 'ponmon';
 
 # Изменить при необходимости и переименовать таблицы в файле ponmon.sql
@@ -14,14 +15,15 @@ $admin_email = "admin@site";
 #$protocol - 'http://' or 'https://'
 $protocol = 'http://';
 
-#$sitename = доменное имя (с полным путем);
-$sitename = 'site/pm';
+    #$sitename = доменное имя (с полным путем);
+    $sitename = '10.0.7.77/pm';
+
 
 # Метод съема таблицы FDB. При проблемах - заменить на 'telnet'
 $FDB_method = 'SNMP';
 
 # Путь к логу скрипта опроса ОНУ
-$log_file = "/var/pm/logs/wb.log";
+$log_file = "/var/log/pm/pm_check_onu.log";
 
 # Названия уровней доступа к системе:
 # администратор - полный доступ
@@ -35,8 +37,9 @@ $PwrHistTerm = "3 MONTH";
 #############################################################################
 $base_url1 = 'PM';
 $date_format1 = 'd.m.Y';
-$years = "2019";
+$years = "2019-2024";
 $servername = "PonMonitor";
-$version = "1.5";
+$version = "2.beta";
 $support_mail = "<a href=\"mailto:$admin_email\">$admin_email</a>";
+$pon_types_names = array ("EPON", "GPON");
 setlocale(LC_ALL, "uk_UA.utf8");

@@ -13,6 +13,7 @@ CREATE TABLE `pm_olt` (
   `status` tinyint(3) DEFAULT NULL,
   `last_act` datetime DEFAULT NULL,
   `olt_type` varchar(255) NOT NULL DEFAULT '1',
+  `type` init(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 

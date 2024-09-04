@@ -27,6 +27,9 @@ if(!isset($_GET["olt_name"])){
 if(!isset($_GET["place"])){
     exit();
 }
+if(!isset($_GET["type"])){
+    exit();
+}
 if(!isset($_GET["olt_id"])){
     exit();
 }
@@ -42,6 +45,7 @@ $community = $_GET["community"];
 $communityrw = $_GET["communityrw"];
 $olt_name = $_GET["olt_name"];
 $place = $_GET["place"];
+$pon_type = $_GET["type"];
 
 require '../include/vars.php';
 require '../include/database.php';
@@ -56,9 +60,9 @@ include '../include/auth_user.php';
 
 $table = $tbl_pref.'olt';
 if ($olt_id == 'new'){
-    $query = "INSERT INTO $table (name, host, place, snmp_port, community, communityrw, telnet_port, telnet_name, telnet_password, status, last_act) VALUES ('$olt_name', '$host', '$place', $snmp_port, '$community', '$communityrw', $t_port, '$t_name', '$t_pass', 1, NOW());";
+    $query = "INSERT INTO $table (name, host, place, snmp_port, community, communityrw, telnet_port, telnet_name, telnet_password, status, last_act, type) VALUES ('$olt_name', '$host', '$place', $snmp_port, '$community', '$communityrw', $t_port, '$t_name', '$t_pass', 1, NOW(), $pon_type);";
 }else{
-    $query = "UPDATE $table SET name='$olt_name', host='$host', place='$place', snmp_port=$snmp_port, community='$community', communityrw='$communityrw', telnet_port=$t_port, telnet_name='$t_name', telnet_password='$t_pass', status=1, last_act=NOW() WHERE Id=$olt_id;";
+    $query = "UPDATE $table SET name='$olt_name', host='$host', place='$place', type=$pon_type, snmp_port=$snmp_port, community='$community', communityrw='$communityrw', telnet_port=$t_port, telnet_name='$t_name', telnet_password='$t_pass', status=1, last_act=NOW() WHERE Id=$olt_id;";
 }
 if($mysqli_wb->query($query)){
     echo "<script type='text/javascript'>\n";

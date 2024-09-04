@@ -34,7 +34,7 @@ if ($con = pfsockopen($host, $port, $errno, $errstr, 10)){
         $s1 = $t_pass."\r\n";
         fwrite($con, $s1);
         sleep(1);
-        $s1 = "su\r\n";
+        $s1 = "ena\r\n";
         fwrite($con, $s1);
         fwrite($con, "show ver \r\n");
         sleep(2);

@@ -1,5 +1,9 @@
 <?php
-include 'include/vars.php';
+#ini_set('display_errors', 1);
+#ini_set('display_startup_errors', 1);
+#error_reporting(E_ALL);
+
+require 'include/vars.php';
 include 'include/database.php';
 include 'include/select_lang.php';
 
@@ -10,7 +14,7 @@ if (empty($request[0])){
     header($url);
     exit;
 }
-require 'include/vars.php';
+
 switch ($request[0]) {
     case 'аутентификация':
     case 'аутентифікація':

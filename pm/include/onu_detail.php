@@ -1,7 +1,6 @@
 <?php
 
 
-$onu_name = "EPON0/$sfp_s:$onu_n";
 
 $table = $tbl_pref.'olt';
 $query = "SELECT * FROM $table WHERE Id = $olt_id;";
@@ -12,6 +11,17 @@ $result->close();
 $olt_name = $row['name'];
 $olt_host = $row['host'];
 $olt_place = $row['place'];
+if ($row['type'] == 1){
+    $olt_gpon = true;
+    $sfp_name = 'GPON0/';
+    $olt_type = 'GPON';
+}else{
+    $olt_gpon = false;
+    $sfp_name = 'EPON0/';
+    $olt_type = 'EPON';
+}
+
+$onu_name = "$sfp_name$sfp_s:$onu_n";
 
 echo '<table class="features-table" width="100%"><thead><tr><td class="grey"><div align="left">';
 echo "<strong>";
@@ -46,45 +56,73 @@ $userid = $row['userid'];
 $mac = $row['mac'];
 $onuId = $row['Id'];
 
-if($key = GetOnuKeyByMac($mac, $host, $community)){
-    $onu_status = GetOnuStatus($key, $host, $community);
-}else{
-    $onu_status = 6;
+$key = GetOnuKeyByMac($mac, $host, $community, $olt_gpon);
+
+if(!$onu_status = GetOnuStatus($key, $host, $community, $olt_gpon)){
+    if ($onu_status != 0){
+        $onu_status = 6;
+    }else{
+        $onu_status = 0;
+    }
 }
 
 $stat_n_ar = array('authenticated', 'registered', 'deregistered', 'auto-configured', 'lost', 'standby', 'OLT offline');
 if ($onu_status == 3){
-    $onu_s = GetOnuPwr($key, $host, $community);
-    $onu_dist = GetOnuDist($key, $host, $community);
+    $onu_s = GetOnuPwr($key, $host, $community, $olt_gpon);
+    $onu_dist = GetOnuDist($key, $host, $community, $olt_gpon);
     # write to DB
     $query = "UPDATE $table SET pwr = '".$onu_s."', status=1, last_act=NOW() WHERE Id=".$row['Id'];
     ##
     $pwr = $onu_s;
+    $pwr_from_onu = GetPwrFromOnu($key, $host, $community, $olt_gpon);
     $tdclass = "green";
+    if ($olt_gpon){
+        $onuRegData = GetGponOnuAct($host, 23, $tlog, $tpas, $onu_name);
+    }else{
+        $onuRegData = GetRegData($host, 23, $tlog, $tpas, $onu_name);
+    }
+}elseif($onu_status < 2 AND $olt_gpon){
+    $pwr = 0;
+    $pwr_from_onu = 0;
+    $onu_s = 'OFFLINE';
+    $onu_dist = "";
+    $query = "UPDATE onu SET status=0 WHERE Id=".$row['Id'];
+    $tdclass = "red";
+    $onuDeregData = GetGponOnuInact($host, 23, $tlog, $tpas, $onu_name);
+}elseif($onu_status == 2){
+    $pwr = 0;
+    $pwr_from_onu = 0;
+    $onu_s = 'OFFLINE';
+    $onu_dist = "";
+    $query = "UPDATE onu SET status=0 WHERE Id=".$row['Id'];
+    $tdclass = "red";
+    $onuDeregData = GetDeregData($host, 23, $tlog, $tpas, $onu_name);
 }elseif($onu_status !=6){
     $pwr = 0;
     $onu_s = 'OFFLINE';
     $onu_dist = "";
-    $query = "UPDATE $table SET status=0 WHERE Id=".$row['Id'];
+    $query = "UPDATE onu SET status=0 WHERE Id=".$row['Id'];
     $tdclass = "red";
-    $onuDeregData = GetDeregData($thost, $tport, $tlog, $tpas, $onu_name);
+    $onuRegData = GetRegData($host, 23, $tlog, $tpas, $onu_name);
 }else{
     $pwr = 0;
+    $pwr_from_onu = 0;
     $onu_s = 'OFFLINE';
     $onu_dist = "";
-    $query = "UPDATE $table SET status=0 WHERE Id=".$row['Id'];
+    $query = "SELECT 1;";
     $tdclass = "red";
 }
 $mysqli_wb->query($query);
 echo '<table class="features-table" width="100%"><thead><tr>';
-echo '<td class="grey" colspan="5">';
+echo '<td class="grey" colspan="6">';
 echo $onu_name;
 echo '</td></tr></thead><tbody><tr>';
-echo '<td class="grey" colspan="5"><strong>';
+echo '<td class="grey" colspan="6"><strong>';
 echo $mac;
 echo '</strong></td></tr><tr>';
 echo '<td class="grey"><strong>'.$labels['Stat'].'</strong></td>';
-echo '<td class="grey"><strong>'.$labels['pon05'].'</strong></td>';
+echo '<td class="grey"><b>'.$labels['pon05'].' ONU</b></td>';
+echo '<td class="grey"><b>'.$labels['pon05'].' OLT</b></td>';
 echo '<td class="grey"><strong>'.$labels['Dist'].'</strong></td>';
 echo '<td class="grey"><strong>'.$labels['Com'].'</strong></td>';
 echo '<td class="grey"><strong>'.$labels['IDKlient'].'</strong></td>';
@@ -104,6 +142,10 @@ echo "</td><td class=\"$tdclass\"><strong>$onu_s</strong>";
 if($pwr != 0){
     echo " Db";
 }
+echo "</a></td><td class=\"$tdclass\">";
+if ($pwr_from_onu){
+    echo "<b>$pwr_from_onu</b> Db";
+}
 echo "</td><td class=\"$tdclass\"><strong>$onu_dist</strong>";
 if($pwr != 0){
     echo " m";
@@ -112,7 +154,7 @@ echo "</td><td class=\"$tdclass\"><strong id=\"comment_t\">$comment</strong> <in
 echo "<td class=\"$tdclass\"><a href=\"\" onclick=\"openuser($userid); return false;\"><strong id=\"userid_t\">$userid</strong></a> <input id=\"userid_new\" type=\"text\" value=\"$userid\" hidden>";
 echo '</tr>';
 echo '<tr><td></td><td><small><a href="javascript:void();" onclick="document.location.reload(true);">['.$labels['Refresh'].']</a></small></td>';
-echo '<td></td><td>';
+echo '<td></td><td></td><td>';
 if ($spLevel < 2){
     echo '<small><div id="editcmd"><a href="javascript:void();" onclick="editcomment();">['.$labels['Edit'].']</a></div></small>';
 }
@@ -124,11 +166,16 @@ if ($spLevel < 2){
 echo '</td>';
 
 echo '</tr>';
-if ($onu_status == 2){
-    echo "<tr><td colspan=6 class=\"$tdclass\">".$labels['Stat']." ONU: <strong>".$onuDeregData['Status']."</strong>&nbsp;&nbsp;|&nbsp;&nbsp;";
-    echo $labels['pon06'].': <strong>'.$onuDeregData['LastRegTime'].'</strong>&nbsp;&nbsp;|&nbsp;&nbsp;';
-    echo $labels['pon07'].': <strong>'.$onuDeregData['LastDeregTime'].'</strong>&nbsp;&nbsp;|&nbsp;&nbsp;';
-    echo $labels['pon08'].': <strong>'.$onuDeregData['LastDeregReason'].'</strong></td></tr>';
+if ($onu_status < 3){
+    echo "<tr><td colspan=6 class=\"$tdclass\">".$labels['Stat']." ONU: <b>".$onuDeregData['Status']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
+    echo $labels['pon06'].': <b>'.$onuDeregData['LastRegTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
+    echo $labels['pon07'].': <b>'.$onuDeregData['LastDeregTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
+    echo $labels['pon08'].': <b>'.$onuDeregData['LastDeregReason'].'</b> <a href="javascript:void();" onclick="show_statuses('.$olt_gpon.');">[info]</a></td></tr>';
+}elseif ($onu_status != 6){
+    echo "<tr><td colspan=6 class=\"$tdclass\">Alive time: <b>".$onuRegData['AliveTime']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
+    echo $labels['pon06'].': <b>'.$onuRegData['LastRegTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
+    echo $labels['pon07'].': <b>'.$onuRegData['LastDeregTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
+    echo $labels['pon08'].': <b>'.$onuRegData['LastDeregReason'].'</b> <a href="javascript:void();" onclick="show_statuses('.$olt_gpon.');">[info]</a></td></tr>';
 }
 
 echo '</tbody><tfoot><tr>';
@@ -145,9 +192,9 @@ if ($spLevel < 2 AND $communityrw !=""){
 echo "</td></tr></tfoot></table>\n";
 # Eth ports
 if ($onu_s != 'OFFLINE'){
-    $onu_eth_ena = GetOnuEthEna($key, $host, $community);
-    $onu_eth_state = GetOnuEthState($key, $host, $community);
-    $onu_eth_pvid = GetOnuPvid($key, $host, $community);
+    $onu_eth_ena = GetOnuEthEna($key, $host, $community, $olt_gpon);
+    $onu_eth_state = GetOnuEthState($key, $host, $community, $olt_gpon);
+    $onu_eth_pvid = GetOnuPvid($key, $host, $community, $olt_gpon);
     echo '<table class="features-table" width="100%"><thead><tr>';
     echo '<td class="grey">Ethernet порт ID</td>';
     echo '<td class="grey">State</td>';
@@ -166,9 +213,12 @@ if ($onu_s != 'OFFLINE'){
                 echo '<td><font color="grey"><strong>DOWN</strong></font></td>';
             }
         }
+        if ($olt_gpon){
+            $onu_eth_pvid[$pkey] = GetGponVLANProfilePvid($onu_eth_pvid[$pkey], $host, $community);
+        }
         echo '<td>'.$onu_eth_pvid[$pkey].'</td>';
         echo '<td><small><a href="javascript:void();" onclick="sh_port_st('.$olt_id.', \''.$onu_mac.'\', '.$pkey.');">['.$labels['Stat'].']</a></small>';
-        if ($spLevel < 2 AND $communityrw !=""){
+        if ($spLevel < 2 AND $communityrw !="" AND !$olt_gpon){
             echo '&nbsp;<small><span id="editvlan"><a href="javascript:void();" onclick="changePVID('.$pkey.', '.$onu_eth_pvid[$pkey].');">['.$labels['Edit'].' PVID]</a></span></small>';
         }
         echo '</td>';
@@ -180,7 +230,9 @@ echo '<div id="onu_data_field"></div>';
 
 
 $mactouser = str_replace(":", "", $mac);
-$mactouser = hexdec($mactouser);
+if (!$olt_gpon){
+    $mactouser = hexdec($mactouser);
+}
 ?>
 <script type='text/javascript'>
 function sh_port_st(sw, port, pkey){

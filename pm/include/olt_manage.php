@@ -1,9 +1,9 @@
 <table class="features-table">
     <thead>
-        <tr><td class="grey" colspan="4">OLT</td></tr>
+        <tr><td class="grey" colspan="5">OLT</td></tr>
     </thead>
     <tbody>
-        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td></tr>
+        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong>PON Type</strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td></tr>
 <?php
 
 if($olt_mode == 'edit'){
@@ -23,10 +23,27 @@ if($olt_mode == 'edit'){
         $t_pass = $row['telnet_password'];
         $status = $row['status'];
         $last_act = $row['last_act'];
+        $olt_gpon = false;
+        $pon_type = 0;
+        if (array_key_exists('type', $row)){
+            if ($row['type'] == 1){
+                $olt_gpon = true;
+                $pon_type = 1;
+            }
+        }
         
     echo "<tr><td>$olt_id</td>";
     echo "<td><input id=\"olt_name\" value=\"$olt_name\"></td>";
     echo "<td><input id=\"place\" value=\"$place\"></td>";
+    echo "<td><select id=\"pon_type\">";
+    foreach ($pon_types_names as $key=>$value){
+        echo "<option value=$key";
+        if ($pon_type == $key){
+            echo " selected";
+        }
+        echo ">$value</option>";
+    }
+    echo "</select></td>";
     echo "<td class=\"client_h\">";
     echo "<li>host: <input id=\"host\" value=\"$host\">";
     echo "<li>SNMP порт: <input id=\"snmp_port\" value=\"$snmp_port\">";
@@ -54,9 +71,20 @@ if($olt_mode == 'edit'){
     $t_pass = '1234';
     $status = 0;
     $last_act = null;
+    $olt_gpon = false;
+    $pon_type = 0;
     echo "<tr><td>&nbsp;</td>";
     echo "<td><input id=\"olt_name\" value=\"$olt_name\"></td>";
     echo "<td><input id=\"place\" value=\"$place\"></td>";
+    echo "<td><select id=\"pon_type\">";
+    foreach ($pon_types_names as $key=>$value){
+        echo "<option value=$key";
+        if ($pon_type == $key){
+            echo " selected";
+        }
+        echo ">$value</option>";
+    }
+    echo "</select></td>";
     echo "<td class=\"client_h\">";
     echo "<li>host: <input id=\"host\" value=\"$host\">";
     echo "<li>SNMP порт: <input id=\"snmp_port\" value=\"$snmp_port\">";
@@ -72,7 +100,7 @@ if($olt_mode == 'edit'){
 ?>
     </tbody>
     <tfoot>
-        <tr><td  class="grey" colspan="4"><button onclick="check_snmp(0); return false;"><?php echo $labels['Check']; ?> SNMP</button> | <button onclick="check_telnet(0); return false;"><?php echo $labels['Check']; ?> telnet</button> | <button onclick="save_olt(1); return false;"><?php echo $labels['Save']; ?></button> | <button onclick="window.location ='<?php echo "$protocol$sitename/$base_url1/настройки"; ?>'; return false;"><?php echo $labels['exit']; ?></button></a></td></tr>
+        <tr><td  class="grey" colspan="5"><button onclick="check_snmp(0); return false;"><?php echo $labels['Check']; ?> SNMP</button> | <button onclick="check_telnet(0); return false;"><?php echo $labels['Check']; ?> telnet</button> | <button onclick="save_olt(1); return false;"><?php echo $labels['Save']; ?></button> | <button onclick="window.location ='<?php echo "$protocol$sitename/$base_url1/настройки"; ?>'; return false;"><?php echo $labels['exit']; ?></button></a></td></tr>
     </tfoot>
 </table>
 <div id="area1"></div>
@@ -177,6 +205,7 @@ function save_olt(par1){
     
     olt_name = document.getElementById('olt_name').value;
     place = document.getElementById('place').value;
+    pon_type = document.getElementById('pon_type').value;
     
     if(olt_name.length < 5){
         alert('<?php echo $labels['pon12']; ?>!');
@@ -197,7 +226,7 @@ function save_olt(par1){
     place = encodeURIComponent(place);
     olt_id = '<?php echo $olt_id; ?>';
     document.getElementById('area3').innerHTML = '<strong>working...</strong>';
-    url1 = '<?php echo $protocol.$sitename; ?>/scripts/save_olt.php?host=' + host + '&olt_name=' + olt_name + '&place=' + place + '&t_port=' + t_port + '&t_name=' + t_name + '&t_pass=' + t_pass + '&snmp_port=' + snmp_port + '&community=' + community + '&olt_id=' + olt_id + "&communityrw=" + communityrw;
+    url1 = '<?php echo $protocol.$sitename; ?>/scripts/save_olt.php?host=' + host + '&olt_name=' + olt_name + '&place=' + place + '&type=' + pon_type + '&t_port=' + t_port + '&t_name=' + t_name + '&t_pass=' + t_pass + '&snmp_port=' + snmp_port + '&community=' + community + '&olt_id=' + olt_id + "&communityrw=" + communityrw;
     $('#area3').load(url1);
     return true;
 }

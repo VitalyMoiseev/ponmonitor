@@ -53,10 +53,10 @@ $result->close();
 </table>
 <table class="features-table">
     <thead>
-        <tr><td class="grey" colspan="5">OLT</td></tr>
+        <tr><td class="grey" colspan="6">OLT</td></tr>
     </thead>
     <tbody>
-        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td><td class="grey"><strong><?php echo $labels['Operations']; ?></strong></td></tr>
+        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong>PON Type</strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td><td class="grey"><strong><?php echo $labels['Operations']; ?></strong></td></tr>
 <?php
 $table = $tbl_pref.'olt';
 $query = "SELECT * FROM $table;";
@@ -74,10 +74,19 @@ while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
     $t_pass = $row['telnet_password'];
     $status = $row['status'];
     $last_act = $row['last_act'];
+    $olt_gpon = false;
+    $pon_type = 0;
+    if (array_key_exists('type', $row)){
+        if ($row['type'] == 1){
+            $olt_gpon = true;
+            $pon_type = 1;
+        }
+    }
         
     echo "<tr><td><strong>$olt_id</strong></td>";
     echo "<td><strong>$olt_name</strong></td>";
     echo "<td><strong>$place</strong></td>";
+    echo "<td><strong>".$pon_types_names[$pon_type]."</strong></td>";
     echo "<td class=\"client_h\">";
     echo "<br><li>host: $host";
     echo "<li>SNMP port: $snmp_port";
@@ -94,7 +103,7 @@ while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
 ?>
     </tbody>
     <tfoot>
-        <tr><td  class="grey" colspan="5">
+        <tr><td  class="grey" colspan="6">
 <?php
 echo "<a href=\"$protocol$sitename/$base_url1/settings/OLT/\">".$labels['Add'];
 ?>
