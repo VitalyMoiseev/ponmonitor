@@ -15,8 +15,8 @@ $admin_email = "admin@site";
 #$protocol - 'http://' or 'https://'
 $protocol = 'http://';
 
-    #$sitename = доменное имя (с полным путем);
-    $sitename = '10.0.7.77/pm';
+#$sitename = доменное имя (с полным путем);
+$sitename = 'server/pm';
 
 
 # Метод съема таблицы FDB. При проблемах - заменить на 'telnet'
