@@ -1,7 +1,7 @@
 <?php
-#ini_set('display_errors', 1);
-#ini_set('display_startup_errors', 1);
-#error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require 'include/vars.php';
 include 'include/database.php';
@@ -118,7 +118,6 @@ switch ($request[0]) {
         default:
         $title = $labels['bilenter'];
         include 'include/header.php';
-        include 'include/vars.php';
         $username = isset($_COOKIE['username']) ? $_COOKIE['username'] : "";
         $message = "";
         if(isset($request[1])){
