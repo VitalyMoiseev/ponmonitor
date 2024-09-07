@@ -55,6 +55,7 @@ $comment = $row['comment'];
 $userid = $row['userid'];
 $mac = $row['mac'];
 $onuId = $row['Id'];
+$desc = $row['description'];
 
 $key = GetOnuKeyByMac($mac, $host, $community, $olt_gpon);
 
@@ -114,10 +115,10 @@ if ($onu_status == 3){
 }
 $mysqli_wb->query($query);
 echo '<table class="features-table" width="100%"><thead><tr>';
-echo '<td class="grey" colspan="6">';
+echo '<td class="grey" colspan="7">';
 echo $onu_name;
 echo '</td></tr></thead><tbody><tr>';
-echo '<td class="grey" colspan="6"><strong>';
+echo '<td class="grey" colspan="7"><strong>';
 echo $mac;
 echo '</strong></td></tr><tr>';
 echo '<td class="grey"><strong>'.$labels['Stat'].'</strong></td>';
@@ -126,6 +127,7 @@ echo '<td class="grey"><b>'.$labels['pon05'].' OLT</b></td>';
 echo '<td class="grey"><strong>'.$labels['Dist'].'</strong></td>';
 echo '<td class="grey"><strong>'.$labels['Com'].'</strong></td>';
 echo '<td class="grey"><strong>'.$labels['IDKlient'].'</strong></td>';
+echo '<td class="grey"><strong>ONU description</strong></td>';
 echo "</tr></thead><tbody><tr><td class=\"$tdclass\">";
 if ($detect->isMobile()){
     echo "<small>";
@@ -150,8 +152,10 @@ echo "</td><td class=\"$tdclass\"><strong>$onu_dist</strong>";
 if($pwr != 0){
     echo " m";
 }
-echo "</td><td class=\"$tdclass\"><strong id=\"comment_t\">$comment</strong> <input id=\"com_new\" type=\"text\" value=\"$comment\" hidden>";
-echo "<td class=\"$tdclass\"><a href=\"\" onclick=\"openuser($userid); return false;\"><strong id=\"userid_t\">$userid</strong></a> <input id=\"userid_new\" type=\"text\" value=\"$userid\" hidden>";
+echo "</td>";
+echo "<td class=\"$tdclass\"><strong id=\"comment_t\">$comment</strong> <input id=\"com_new\" type=\"text\" value=\"$comment\" hidden></td>";
+echo "<td class=\"$tdclass\"><a href=\"\" onclick=\"openuser($userid); return false;\"><strong id=\"userid_t\">$userid</strong></a> <input id=\"userid_new\" type=\"text\" value=\"$userid\" hidden></td>";
+echo "<td class=\"$tdclass\"><strong>$desc</strong></td>";
 echo '</tr>';
 echo '<tr><td></td><td><small><a href="javascript:void();" onclick="document.location.reload(true);">['.$labels['Refresh'].']</a></small></td>';
 echo '<td></td><td></td><td>';
@@ -163,23 +167,25 @@ echo '<td>';
 if ($spLevel < 2){
     echo '<small><div id="edituserid"><a href="javascript:void();" onclick="edituserid();">['.$labels['Edit'].']</a></div></small><div id="editcmdu"></div>';
 }
+echo '</td><td>';
+echo '<small><a href="javascript:void();" onclick="upd_desc('.$olt_id.');">['.$labels['Refresh'].']</a></small>';
 echo '</td>';
 
 echo '</tr>';
 if ($onu_status < 3){
-    echo "<tr><td colspan=6 class=\"$tdclass\">".$labels['Stat']." ONU: <b>".$onuDeregData['Status']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
+    echo "<tr><td colspan=7 class=\"$tdclass\">".$labels['Stat']." ONU: <b>".$onuDeregData['Status']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
     echo $labels['pon06'].': <b>'.$onuDeregData['LastRegTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
     echo $labels['pon07'].': <b>'.$onuDeregData['LastDeregTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
     echo $labels['pon08'].': <b>'.$onuDeregData['LastDeregReason'].'</b> <a href="javascript:void();" onclick="show_statuses('.$olt_gpon.');">[info]</a></td></tr>';
 }elseif ($onu_status != 6){
-    echo "<tr><td colspan=6 class=\"$tdclass\">Alive time: <b>".$onuRegData['AliveTime']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
+    echo "<tr><td colspan=7 class=\"$tdclass\">Alive time: <b>".$onuRegData['AliveTime']."</b>&nbsp;&nbsp;|&nbsp;&nbsp;";
     echo $labels['pon06'].': <b>'.$onuRegData['LastRegTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
     echo $labels['pon07'].': <b>'.$onuRegData['LastDeregTime'].'</b>&nbsp;&nbsp;|&nbsp;&nbsp;';
     echo $labels['pon08'].': <b>'.$onuRegData['LastDeregReason'].'</b> <a href="javascript:void();" onclick="show_statuses('.$olt_gpon.');">[info]</a></td></tr>';
 }
 
 echo '</tbody><tfoot><tr>';
-echo '<td class="grey" colspan="6">';
+echo '<td class="grey" colspan="7">';
 echo '|&nbsp;&nbsp;&nbsp;<strong><a href="javascript:void();" onclick="show_signal_history(\''.$mac.'\')">'.$labels['HistPwr'].'</a></strong>&nbsp;&nbsp;&nbsp;|';
 if ($onu_s !='OFFLINE'){
     echo '&nbsp;&nbsp;&nbsp;<strong><a href="javascript:void();" onclick="show_FDB(\''.$olt_id.'\',\''.$onu_name.'\', \''.$mac.'\', '.$key.', '.$onuId.')">FDB '.$labels['table'].'</a></strong>&nbsp;&nbsp;&nbsp;|';
@@ -189,6 +195,8 @@ if ($onu_s !='OFFLINE'){
 if ($spLevel < 2 AND $communityrw !=""){
     echo '&nbsp;&nbsp;&nbsp;<strong><a href="javascript:void();" onclick="manage_ONU_OLT(\''.$olt_id.'\', '.$key.');">Manage ONU and OLT</a></strong>&nbsp;&nbsp;&nbsp;|';
 }
+echo "&nbsp;&nbsp;&nbsp;<b><a href=\"javascript:void();\" onclick=\"show_int();\">Show interface</a></b>&nbsp;&nbsp;&nbsp;|\n";
+echo "&nbsp;&nbsp;&nbsp;<b><a href=\"javascript:void();\" onclick=\"showONUbasic($olt_id, '$onu_name', '$olt_type');\">Show ONU basic-info</a></b>&nbsp;&nbsp;&nbsp;|\n";
 echo "</td></tr></tfoot></table>\n";
 # Eth ports
 if ($onu_s != 'OFFLINE'){
@@ -214,7 +222,8 @@ if ($onu_s != 'OFFLINE'){
             }
         }
         if ($olt_gpon){
-            $onu_eth_pvid[$pkey] = GetGponVLANProfilePvid($onu_eth_pvid[$pkey], $host, $community);
+            
+            $onu_eth_pvid[$pkey] = $onu_eth_pvid[$pkey] == 0 ? 1 : GetGponVLANProfilePvid($onu_eth_pvid[$pkey], $host, $community);
         }
         echo '<td>'.$onu_eth_pvid[$pkey].'</td>';
         echo '<td><small><a href="javascript:void();" onclick="sh_port_st('.$olt_id.', \''.$onu_mac.'\', '.$pkey.');">['.$labels['Stat'].']</a></small>';
@@ -288,6 +297,39 @@ function manage_ONU_OLT(olt_id, onu_key){
     document.getElementById('onu_data_field').innerHTML = '<strong>working...</strong>';
     var onu_name = encodeURIComponent('<?php echo $onu_name; ?>')
     var url1 = "<?php echo $protocol.$sitename; ?>/scripts/manage_ONU_OLT.php?olt_id=" + olt_id + "&onu_key=" + onu_key + "&onu_name=" + onu_name;
+    $('#onu_data_field').load(url1);
+}
+function show_int(){
+    document.getElementById('onu_data_field').innerHTML = '<b>working...</b>';
+    var onu_name = encodeURIComponent('<?php echo $onu_name; ?>')
+    var thost = encodeURIComponent('<?php echo $thost; ?>');
+    var tlog = encodeURIComponent('<?php echo $tlog; ?>');
+    var tport = encodeURIComponent('<?php echo $tport; ?>');
+    var tpas = encodeURIComponent('<?php echo $tpas; ?>');
+    var url1 = "<?php echo $protocol.$sitename; ?>/scripts/get_pon_int.php?thost=" + thost + "&tport=" + tport + "&tlog=" + tlog + "&tpas=" + tpas + "&onu_name=" + onu_name;
+    $('#onu_data_field').load(url1);
+}
+function showONUbasic(olt_id, onu_name, olt_type){
+    document.getElementById('onu_data_field').innerHTML = '<b>working...</b>';
+    var thost = encodeURIComponent('<?php echo $thost; ?>');
+    var tlog = encodeURIComponent('<?php echo $tlog; ?>');
+    var tport = encodeURIComponent('<?php echo $tport; ?>');
+    var tpas = encodeURIComponent('<?php echo $tpas; ?>');
+    var url1 = "<?php echo $protocol.$sitename; ?>/scripts/get_ONU_bainf.php?olt_id=" + olt_id + "&onu_name=" + encodeURIComponent(onu_name) + "&tlog=" + tlog + "&tpas=" + tpas + "&thost=" + thost + "&tport=" + tport + "&olt_type=" + encodeURIComponent(olt_type);
+    $('#onu_data_field').load(url1);
+}
+function show_statuses(gpon){
+        document.getElementById('onu_data_field').innerHTML = '<b>working...</b>';
+        var url1 = "<?php echo $protocol.$sitename; ?>/scripts/get_pon_statuses.php?gpon=" + gpon;
+        $('#onu_data_field').load(url1);
+}
+function upd_desc(olt){
+    if (window.confirm('Update ONU descriptions for all ONU on this OLT?')){
+        var url1 = "<?php echo $protocol.$sitename; ?>/scripts/upd_desc.php?web=1&olt_check=" + olt;
+    }else{
+        return;
+    }
+    document.getElementById('onu_data_field').innerHTML = '<b>working...</b>';
     $('#onu_data_field').load(url1);
 }
 </script>

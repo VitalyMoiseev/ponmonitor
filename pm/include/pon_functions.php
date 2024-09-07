@@ -192,7 +192,7 @@ function GetGponVLANProfilePvid($profile, $host, $community) {
         $session->close();
         return $aaa;
     }else{
-        return 1;
+        return false;
     }
 }
 

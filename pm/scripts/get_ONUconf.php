@@ -40,7 +40,7 @@ if ($con = pfsockopen($host, $port, $errno, $errstr, 10)){
     $s1 = $tpas."\r\n";
     fwrite($con, $s1);
     sleep(1);
-    $s1 = "su\r\n";
+    $s1 = "ena\r\n";
     fwrite($con, $s1);
     fwrite($con, "show running-config interface $onu_name \r\n");
     sleep(2);

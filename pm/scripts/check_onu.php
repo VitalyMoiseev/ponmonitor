@@ -332,7 +332,7 @@ $query = "SELECT * FROM $table $olt_check";
     }
     
 ####### ONU pwr history
-/*
+
 # read last powers
     $table = $tbl_pref.'onu_pwr_history';
     $query = "SELECT * FROM $table WHERE stoptime IS NULL";
@@ -356,7 +356,9 @@ $query = "SELECT * FROM $table $olt_check";
         foreach ($pwrs_macs as $mac => $pwr) {
             if (array_key_exists($mac, $pwr_old)){
                 $pwr = $pwr + 0;
-                if($pwr_old[$mac] != $pwr){
+                $pwrdif = $pwr_old[$mac] - $pwr;
+                $pwrdif = abs($pwrdif);
+                if ($pwrdif > $pwr_diff_to_rec){
                     $h_id = $hist_ids[$mac];
                     $pwr = str_replace(",", ".", $pwr);
                     $query .= "UPDATE $table SET stoptime=NOW() WHERE Id=$h_id;\n";
@@ -387,7 +389,7 @@ $query = "SELECT * FROM $table $olt_check";
     }
     
 #
-*/
+
 #######
 }else{
     $ttt = time() - strtotime($param['onu_check_last_start']);

@@ -13,12 +13,14 @@ switch ($lang) {
     case 'ru':
         setlocale(LC_ALL, "ru_RU.UTF-8");
         $query = "SELECT label, label_ru AS text FROM $table;";
+        $date_loc = "ru_RU";
 
 	break;
     default:
         // укр
         setlocale(LC_ALL, "uk_UA.UTF-8");
         $query = "SELECT label, label_uk AS text FROM $table;";
+        $date_loc = "uk_UA";
 }
 if($result = $mysqli_wb->query($query)){
     while( $row = $result->fetch_array(MYSQLI_ASSOC) ){

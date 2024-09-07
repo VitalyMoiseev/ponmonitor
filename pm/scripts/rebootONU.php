@@ -38,7 +38,7 @@ if($row['snmp_port'] != 161){
 if($session = new SNMP(SNMP::VERSION_2C, $host, $communityrw, 2000000, 20)){
     $oid = ".1.3.6.1.4.1.3320.101.10.1.1.29.$onu_key";
     if($session->set($oid, 'i', 0)){
-        echo "<strong>Command ONU reboot was send!</strong>\n";
+        echo "<strong>Command ONU reboot has been sent!</strong>\n";
     }else{
         echo "<strong><font color=\"red\">SNMP Error!</font></strong>";
     }

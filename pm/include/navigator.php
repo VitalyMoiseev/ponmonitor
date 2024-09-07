@@ -24,5 +24,9 @@ if($spLevel == 0){
 echo "<td class=\"grey\"><a href=\"$protocol$sitename/exit\">".$labels['exit']."</a></td></tr>";
 ?>
 </thead>
-<tfoot><tr><td style="vertical-align: center; text-align: right;" class="grey" colspan="<?php echo $trdcs; ?>"><small><?php echo $labels['User']; ?>: <strong><?php echo $username; ?></strong> &nbsp;&DoubleVerticalBar;&nbsp; <?php echo strftime("%c"); ?></small></td></tr></tfoot>
+<tfoot><tr><td style="vertical-align: center; text-align: right;" class="grey" colspan="<?php echo $trdcs; ?>"><small><?php echo $labels['User']; ?>: <strong><?php echo $username; ?></strong> &nbsp;&DoubleVerticalBar;&nbsp; 
+<?php
+$formatter = new IntlDateFormatter($date_loc, IntlDateFormatter::LONG, IntlDateFormatter::MEDIUM);
+echo $formatter->format(time());
+?></small></td></tr></tfoot>
 </table>

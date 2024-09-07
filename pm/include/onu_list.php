@@ -70,6 +70,13 @@ if ($OrderOnu == 'userid ASC'){
     echo "&nbsp;&uArr;";
 }
 echo "</span></a></strong></td>\n";
+echo "<td class=\"grey\"><strong><a href=\"\" onclick=\"sortby('description'); return false;\">ONU description<span id=\"sort_description\">";
+if ($OrderOnu == 'description ASC'){
+    echo "&nbsp;&dArr;";
+}elseif ($OrderOnu == 'description DESC'){
+    echo "&nbsp;&uArr;";
+}
+echo "</span></a></strong></td>\n";
 echo "<td class=\"grey\"><strong><a href=\"\" onclick=\"sortby('pwr'); return false;\">".$labels['pon05']."<span id=\"sort_pwr\">";
 if ($OrderOnu == 'pwr ASC'){
     echo "&nbsp;&dArr;";
@@ -113,7 +120,7 @@ while( $onu_t = $result->fetch_array(MYSQLI_ASSOC) ){
             if ($detect->isMobile()){
                 echo "</small>";
             }
-            echo '</td><td class="'.$tdclass.'">'.$onu_t['comment'].'</td><td class="'.$tdclass.'">'.$onu_t['userid'].'</td><td class="'.$tdclass.'"><strong>'.$onu_t['pwr'].'</strong></td><td class="'.$tdclass.'">'.$onu_t['last_act'].'</td></tr>';
+            echo '</td><td class="'.$tdclass.'">'.$onu_t['comment'].'</td><td class="'.$tdclass.'">'.$onu_t['userid'].'</td><td class="'.$tdclass.'">'.$onu_t['description'].'</td><td class="'.$tdclass.'"><strong>'.$onu_t['pwr'].'</strong></td><td class="'.$tdclass.'">'.$onu_t['last_act'].'</td></tr>';
         }
     unset ($onu_us);
     }

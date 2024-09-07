@@ -31,7 +31,7 @@ while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
     echo $row['last_act'];
     echo "</td></tr>";
 }
-echo '</tbody><tfoot><tr><td class="grey" colspan="6"><div id="pon_status"><a href="" onclick="check_onu(0); return false;">'.$labels['pon02'].'</a></div></td></tr></tfoot>';
+echo '</tbody><tfoot><tr><td class="grey" colspan="5"><div id="pon_status"><a href="" onclick="check_onu(0); return false;">'.$labels['pon02'].'</a> | <a href="" onclick="upd_desc(); return false;">Update ONU descriptions</a></div></td></tr></tfoot>';
 echo "</table>";
 $result->close();
 echo '<table class="features-table" width="100%"><thead><tr><td class="grey" colspan="5">'.$labels['Find'].' ONU</td></tr><thead><tbody>';
@@ -160,6 +160,15 @@ function check_onu(olt){
         }
     }else{
         var url1 = "<?php echo $protocol.$sitename; ?>/scripts/check_onu.php?web=1&olt_check=" + olt;
+    }
+    document.getElementById('pon_status').innerHTML = '<strong>working...</strong>';
+    $('#pon_status').load(url1);
+}
+function upd_desc(){
+    if (window.confirm('Update ONU descriptions for all OLT?')){
+        var url1 = "<?php echo $protocol.$sitename; ?>/scripts/upd_desc.php?web=1";
+    }else{
+        return;
     }
     document.getElementById('pon_status').innerHTML = '<strong>working...</strong>';
     $('#pon_status').load(url1);
