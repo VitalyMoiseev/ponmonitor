@@ -35,9 +35,10 @@ echo '</tbody><tfoot><tr><td class="grey" colspan="5"><div id="pon_status"><a hr
 echo "</table>";
 $result->close();
 echo '<table class="features-table" width="100%"><thead><tr><td class="grey" colspan="5">'.$labels['Find'].' ONU</td></tr><thead><tbody>';
-echo '<tr><td class="grey">&nbsp;</td><td><strong>'.$labels['Com'].':</strong></td><td><input id="s_com" size="30"></td><td><button id = "serach_com">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
-echo '<tr><td class="grey">&nbsp;</td><td><strong>'.$labels['IDKlient'].':</strong></td><td><input id="s_id" size="30"></td><td><button id = "serach_id">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
-echo '<tr><tr><td class="grey">&nbsp;</td><td><strong>MAC:</strong></td><td><input id="s_mac" size="30"></td><td><button id = "serach_mac">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
+echo '<tr><td class="grey">&nbsp;</td><td><strong>'.$labels['Com'].':</strong></td><td><input id="s_com" size="30"></td><td><button id = "search_com">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
+echo '<tr><td class="grey">&nbsp;</td><td><strong>'.$labels['IDKlient'].':</strong></td><td><input id="s_id" size="30"></td><td><button id = "search_id">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
+echo '<tr><tr><td class="grey">&nbsp;</td><td><strong>Description:</strong></td><td><input id="s_desc" size="30"></td><td><button id = "search_desc">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
+echo '<tr><tr><td class="grey">&nbsp;</td><td><strong>MAC:</strong></td><td><input id="s_mac" size="30"></td><td><button id = "search_mac">'.$labels['Find'].'</button></td><td class="grey">&nbsp;</td></tr>';
 echo '</tbody><tfoot><tr><td class="grey" colspan="5"></td></tr></tfoot>';
 echo "</table>";
 echo '<div id="search_status"></div>';
@@ -102,21 +103,29 @@ if ($detect->isMobile()){
 ?>
 <script type='text/javascript'>
 $(document).ready(function(){
-    $('#serach_com').click(function(){
+    $('#search_com').click(function(){
         document.getElementById('search_status').innerHTML = '<strong>working...</strong>';
         var s_com = document.getElementById('s_com').value;
         s_com = encodeURIComponent(s_com);
         var url1 = "<?php echo $protocol.$sitename; ?>/scripts/search_onu.php?s=com&pat=" + s_com;
         $('#search_status').load(url1);
     });
-    $('#serach_id').click(function(){
+    $('#search_id').click(function(){
         document.getElementById('search_status').innerHTML = '<strong>working...</strong>';
         var s_com = document.getElementById('s_id').value;
         s_com = encodeURIComponent(s_com);
         var url1 = "<?php echo $protocol.$sitename; ?>/scripts/search_onu.php?s=userid&pat=" + s_com;
         $('#search_status').load(url1);
     });
-    $('#serach_mac').click(function(){
+    $('#search_desc').click(function(){
+        document.getElementById('search_status').innerHTML = '<strong>working...</strong>';
+        var s_com = document.getElementById('s_desc').value;
+        s_com = encodeURIComponent(s_com);
+        var url1 = "<?php echo $protocol.$sitename; ?>/scripts/search_onu.php?s=desc&pat=" + s_com;
+        alert(url1);
+        $('#search_status').load(url1);
+    });
+    $('#search_mac').click(function(){
         document.getElementById('search_status').innerHTML = '<strong>working...</strong>';
         var s_com = document.getElementById('s_mac').value;
         s_com = encodeURIComponent(s_com);
@@ -124,7 +133,7 @@ $(document).ready(function(){
         $('#search_status').load(url1);
     });
     $('#s_com').bind("enterKey",function(e){
-     document.getElementById("serach_com").click();
+     document.getElementById("search_com").click();
     });
     $('#s_com').keyup(function(e){
      if(e.keyCode == 13)
@@ -133,7 +142,7 @@ $(document).ready(function(){
      }
     });
     $('#s_id').bind("enterKey",function(e){
-     document.getElementById("serach_id").click();
+     document.getElementById("search_id").click();
     });
     $('#s_id').keyup(function(e){
      if(e.keyCode == 13)
@@ -142,9 +151,18 @@ $(document).ready(function(){
      }
     });
     $('#s_mac').bind("enterKey",function(e){
-     document.getElementById("serach_mac").click();
+     document.getElementById("search_mac").click();
     });
     $('#s_mac').keyup(function(e){
+     if(e.keyCode == 13)
+     {
+        $(this).trigger("enterKey");
+     }
+    });
+    $('#s_desc').bind("enterKey",function(e){
+     document.getElementById("search_desc").click();
+    });
+    $('#s_desc').keyup(function(e){
      if(e.keyCode == 13)
      {
         $(this).trigger("enterKey");

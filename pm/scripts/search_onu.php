@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require '../include/vars.php';
 require '../include/database.php';
@@ -12,13 +15,15 @@ if(isset($_GET['s'])){
         while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
             $olt[$row['Id']] = $row;
         }
-        $result->close;
+        $result->close();
         $s_com = $mysqli_wb->real_escape_string($s_com);
         $table = $tbl_pref.'onu';
         if($_GET['s'] == 'com'){
             $query = "SELECT * FROM $table WHERE present=1 AND comment LIKE '%$s_com%' LIMIT 50";
         }elseif($_GET['s'] == 'userid'){
             $query = "SELECT * FROM $table WHERE present=1 AND userid = $s_com LIMIT 50";
+        }elseif($_GET['s'] == 'desc'){
+            $query = "SELECT * FROM $table WHERE present=1 AND description LIKE '%$s_com%' LIMIT 50";
         }else{
             $query = "SELECT * FROM $table WHERE present=1 AND mac LIKE '%$s_com%' LIMIT 50";
         }
@@ -26,7 +31,7 @@ if(isset($_GET['s'])){
         
         $result = $mysqli_wb->query($query);
         echo '<table class="features-table" width="100%"><thead>';
-        echo "<td class=\"grey\">&nbsp;</td><td class=\"grey\"><strong>OLT</strong></td><td class=\"grey\"><strong>ONU</strong></td><td class=\"grey\"><strong>mac</strong></td><td class=\"grey\"><strong>".$labels['Com']."</strong></td><td class=\"grey\"><strong>".$labels['IDKlient']."</strong></td><td class=\"grey\"><strong>".$labels['pon05']."</strong></td><td class=\"grey\"><strong>".$labels['L_act']."</strong></td></tr></thead><tbody>";
+        echo "<td class=\"grey\">&nbsp;</td><td class=\"grey\"><strong>OLT</strong></td><td class=\"grey\"><strong>ONU</strong></td><td class=\"grey\"><strong>mac</strong></td><td class=\"grey\"><strong>".$labels['Com']."</strong></td><td class=\"grey\"><strong>".$labels['IDKlient']."</strong></td><td class=\"grey\"><strong>ONU description</strong></td><td class=\"grey\"><strong>".$labels['pon05']."</strong></td><td class=\"grey\"><strong>".$labels['L_act']."</strong></td></tr></thead><tbody>";
     
         while( $row = $result->fetch_array(MYSQLI_ASSOC) ){
             $onu_t = $row;
@@ -42,9 +47,9 @@ if(isset($_GET['s'])){
             $onu_n = $spl2[1];
             echo '<td class="'.$tdclass.'"><a href="'.$protocol.$sitename.'/'.$base_url1.'/PON/'.$onu_t['olt'].'/'.$sfp_n.'/'.$onu_n.'/'.$onu_t['mac'].'">ONU card</td>';
             echo '<td class="'.$tdclass.'"><strong>'.$olt[$onu_t['olt']]['name'].'</strong></td>';
-            echo '<td class="'.$tdclass.'"><strong>'.$onu_t['onu_name'].'</strong></td><td class="'.$tdclass.'">'.$onu_t['mac'].'</td><td class="'.$tdclass.'">'.$onu_t['comment'].'</td><td class="'.$tdclass.'">'.$onu_t['userid'].'</td><td class="'.$tdclass.'">'.$onu_t['pwr'].'</td><td class="'.$tdclass.'">'.$onu_t['last_act'].'</td></tr>';
+            echo '<td class="'.$tdclass.'"><strong>'.$onu_t['onu_name'].'</strong></td><td class="'.$tdclass.'">'.$onu_t['mac'].'</td><td class="'.$tdclass.'">'.$onu_t['comment'].'</td><td class="'.$tdclass.'">'.$onu_t['userid'].'</td><td class="'.$tdclass.'">'.$onu_t['description'].'</td><td class="'.$tdclass.'">'.$onu_t['pwr'].'</td><td class="'.$tdclass.'">'.$onu_t['last_act'].'</td></tr>';
         }
-        echo '</tbody><tfoot><tr><td class="grey" colspan="8"><button id = "reset_res">Очистить результаты</button></td></tr></tfoot>';
+        echo '</tbody><tfoot><tr><td class="grey" colspan="9"><button id = "reset_res">Очистить результаты</button></td></tr></tfoot>';
         echo "</table>";
         ?>
 <script type='text/javascript'>
