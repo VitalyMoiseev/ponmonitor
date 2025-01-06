@@ -72,9 +72,10 @@ switch ($FDB_method) {
         $s1 = $tpas."\r\n";
         fwrite($con, $s1);
         sleep(1);
-        $s1 = "su\r\n";
+        $s1 = "enable\r\n";
         fwrite($con, $s1);
         fwrite($con, "show mac a int $onu \r\n");
+		#fwrite($con, "show mac address-table int $onu \r\n");
         sleep(2);
         $out = fread($con, 16536);
         $out = explode(' -----', $out);
