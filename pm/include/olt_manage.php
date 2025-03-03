@@ -3,7 +3,7 @@
         <tr><td class="grey" colspan="5">OLT</td></tr>
     </thead>
     <tbody>
-        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong>PON Type</strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td></tr>
+        <tr><td class="grey"><strong>№</strong></td><td class="grey"><strong><?php echo $labels['Nazv']; ?></strong></td><td class="grey"><strong><?php echo $labels['PlaceSet']; ?></strong></td><td class="grey"><strong>PON Type</strong></td><td class="grey"><strong><?php echo $labels['AccessP']; ?></strong></td></tr>
 <?php
 
 if($olt_mode == 'edit'){
